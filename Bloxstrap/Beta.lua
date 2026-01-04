@@ -3,101 +3,110 @@ local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 
-
 local gui = Instance.new("ScreenGui")
-gui.Name = "FFlagsInjector"
-gui.IgnoreGuiInset = true
+gui.Name = "FFlagsEditor"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.fromScale(0.5, 0.6)
+frame.Position = UDim2.fromScale(0.25, 0.2)
+frame.BackgroundColor3 = Color3.fromRGB(24,24,24)
 
-local shadow = Instance.new("Frame", gui)
-shadow.Size = UDim2.fromScale(0.56, 0.62)
-shadow.Position = UDim2.fromScale(0.22, 0.19)
-shadow.BackgroundColor3 = Color3.fromRGB(0,0,0)
-shadow.BackgroundTransparency = 0.45
-shadow.BorderSizePixel = 0
-Instance.new("UICorner", shadow).CornerRadius = UDim.new(0,16)
+local topBar = Instance.new("Frame", frame)
+topBar.Size = UDim2.fromScale(1, 0.08)
+topBar.Position = UDim2.fromScale(0, 0)
+topBar.BackgroundColor3 = Color3.fromRGB(18,18,18)
 
-
-local main = Instance.new("Frame", gui)
-main.Size = UDim2.fromScale(0.55, 0.6)
-main.Position = UDim2.fromScale(0.225, 0.2)
-main.BackgroundColor3 = Color3.fromRGB(16,16,18)
-main.BorderSizePixel = 0
-main.Active = true
-main.Draggable = true
-Instance.new("UICorner", main).CornerRadius = UDim.new(0,14)
-
-local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.fromRGB(35,35,38)
-stroke.Thickness = 1
-
-
-local top = Instance.new("Frame", main)
-top.Size = UDim2.fromScale(1, 0.085)
-top.BackgroundColor3 = Color3.fromRGB(20,20,22)
-top.BorderSizePixel = 0
-Instance.new("UICorner", top).CornerRadius = UDim.new(0,14)
-
-local mask = Instance.new("Frame", top)
-mask.Size = UDim2.fromScale(1, 0.5)
-mask.Position = UDim2.fromScale(0, 0.5)
-mask.BackgroundColor3 = Color3.fromRGB(20,20,22)
-mask.BorderSizePixel = 0
-
-
-local title = Instance.new("TextLabel", top)
+local title = Instance.new("TextLabel", topBar)
+title.Size = UDim2.fromScale(1, 1)
 title.BackgroundTransparency = 1
-title.Size = UDim2.fromScale(0.6, 1)
-title.Position = UDim2.fromScale(0.03, 0)
-title.Text = "FFlags Injector"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-title.TextXAlignment = Left
-title.TextColor3 = Color3.fromRGB(245,245,245)
+title.Text = "FFlags Editor"
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(230,230,230)
 
+local closeBtn = Instance.new("TextButton", topBar)
+closeBtn.Size = UDim2.fromOffset(24,24)
+closeBtn.Position = UDim2.new(1, -28, 0, 4)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 18
+closeBtn.TextColor3 = Color3.new(1,1,1)
+closeBtn.BackgroundColor3 = Color3.fromRGB(36,36,36)
 
-local counter = Instance.new("TextLabel", top)
-counter.BackgroundTransparency = 1
-counter.Size = UDim2.fromScale(0.25, 1)
-counter.Position = UDim2.fromScale(0.55, 0)
-counter.TextXAlignment = Right
-counter.Font = Enum.Font.Gotham
-counter.TextSize = 12
-counter.TextColor3 = Color3.fromRGB(170,170,170)
-counter.Text = "0.00 KB"
+local minBtn = Instance.new("TextButton", topBar)
+minBtn.Size = UDim2.fromOffset(20,20)
+minBtn.Position = UDim2.new(1, -60, 0, 6)
+minBtn.Text = ""
+minBtn.BackgroundColor3 = Color3.new(1,1,1)
+minBtn.BorderSizePixel = 0
 
+local textBox = Instance.new("TextBox", frame)
+textBox.Position = UDim2.fromScale(0.025, 0.12)
+textBox.Size = UDim2.fromScale(0.95, 0.7)
+textBox.MultiLine = true
+textBox.ClearTextOnFocus = false
+textBox.Text = ""
+textBox.PlaceholderText = "Pegá tus FFlags aquí (JSON)"
+textBox.Font = Enum.Font.Code
+textBox.TextSize = 14
+textBox.TextColor3 = Color3.fromRGB(230,230,230)
+textBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
 
-local buttons = Instance.new("Frame", top)
-buttons.Size = UDim2.fromScale(0.12, 1)
-buttons.Position = UDim2.fromScale(0.86, 0)
-buttons.BackgroundTransparency = 1
+local saveBtn = Instance.new("TextButton", frame)
+saveBtn.Size = UDim2.fromScale(0.45, 0.1)
+saveBtn.Position = UDim2.fromScale(0.025, 0.84)
+saveBtn.Text = "Guardar"
+saveBtn.Font = Enum.Font.SourceSans
+saveBtn.TextSize = 18
+saveBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+saveBtn.TextColor3 = Color3.fromRGB(235,235,235)
 
+local rejoinBtn = Instance.new("TextButton", frame)
+rejoinBtn.Size = UDim2.fromScale(0.45, 0.1)
+rejoinBtn.Position = UDim2.fromScale(0.525, 0.84)
+rejoinBtn.Text = "Guardar + Rejoin"
+rejoinBtn.Font = Enum.Font.SourceSans
+rejoinBtn.TextSize = 18
+rejoinBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+rejoinBtn.TextColor3 = Color3.fromRGB(235,235,235)
 
-local minimize = Instance.new("TextButton", buttons)
-minimize.Size = UDim2.fromOffset(18,18)
-minimize.Position = UDim2.fromScale(0.05, 0.5)
-minimize.AnchorPoint = Vector2.new(0,0.5)
-minimize.Text = ""
-minimize.BackgroundColor3 = Color3.fromRGB(245,245,245)
-minimize.BorderSizePixel = 0
-Instance.new("UICorner", minimize).CornerRadius = UDim.new(1,0)
+local function saveFFlags()
+	local ok = pcall(function()
+		HttpService:JSONDecode(textBox.Text)
+	end)
 
+	if not ok then
+		warn("JSON inválido")
+		return
+	end
 
-local close = Instance.new("TextButton", buttons)
-close.Size = UDim2.fromOffset(18,18)
-close.Position = UDim2.fromScale(0.55, 0.5)
-close.AnchorPoint = Vector2.new(0,0.5)
-close.Text = "✕"
-close.Font = Enum.Font.GothamBold
-close.TextSize = 14
-close.TextColor3 = Color3.fromRGB(240,240,240)
-close.BackgroundColor3 = Color3.fromRGB(32,32,34)
-close.BorderSizePixel = 0
-Instance.new("UICorner", close).CornerRadius = UDim.new(1,0)
+	writefile("ClientSettings.json", textBox.Text)
+end
 
+saveBtn.MouseButton1Click:Connect(saveFFlags)
+rejoinBtn.MouseButton1Click:Connect(function()
+	saveFFlags()
+	TeleportService:Teleport(game.PlaceId, player)
+end)
 
+closeBtn.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+local minimized = false
+minBtn.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	textBox.Visible = not minimized
+	saveBtn.Visible = not minimized
+	rejoinBtn.Visible = not minimized
+	if minimized then
+		frame.Size = UDim2.fromScale(0.5, 0.08)
+	else
+		frame.Size = UDim2.fromScale(0.5, 0.6)
+	end
+end)
 local content = Instance.new("Frame", main)
 content.Position = UDim2.fromScale(0, 0.085)
 content.Size = UDim2.fromScale(1, 0.915)
