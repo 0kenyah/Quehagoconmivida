@@ -1,10 +1,8 @@
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
-local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 
--- Crear carpeta Delta > BloxstrapBeta > FFlagsJSON
 local delta = workspace:FindFirstChild("Delta") or Instance.new("Folder", workspace)
 delta.Name = "Delta"
 
@@ -17,7 +15,6 @@ fflagsFolder.Name = "FFlagsJSON"
 local jsonFile = fflagsFolder:FindFirstChild("FFlags.json") or Instance.new("StringValue", fflagsFolder)
 jsonFile.Name = "FFlags.json"
 
--- GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "FFlagsInjectorGUI"
 gui.ResetOnSpawn = false
@@ -121,7 +118,7 @@ rejoinBtn.TextSize = 16
 rejoinBtn.Text = "Guardar + Rejoin"
 rejoinBtn.Parent = main
 
-local function applyFFlagsFromJSON(jsonText)
+local function applyFFlags(jsonText)
 	local ok, data = pcall(function()
 		return HttpService:JSONDecode(jsonText)
 	end)
@@ -132,11 +129,11 @@ local function applyFFlagsFromJSON(jsonText)
 	for k,v in pairs(data) do
 		pcall(function()
 			if type(v) == "boolean" then
-				settings():SetFFlag(k, v)
+				settings():SetFFlag(k,v)
 			elseif type(v) == "number" then
-				settings():SetDFFlag(k, v)
+				settings():SetDFFlag(k,v)
 			else
-				settings():SetFFlag(k, tostring(v))
+				settings():SetFFlag(k,tostring(v))
 			end
 		end)
 	end
@@ -144,11 +141,11 @@ local function applyFFlagsFromJSON(jsonText)
 end
 
 saveBtn.MouseButton1Click:Connect(function()
-	applyFFlagsFromJSON(textBox.Text)
+	applyFFlags(textBox.Text)
 end)
 
 rejoinBtn.MouseButton1Click:Connect(function()
-	applyFFlagsFromJSON(textBox.Text)
+	applyFFlags(textBox.Text)
 	TeleportService:Teleport(game.PlaceId, player)
 end)
 
@@ -170,109 +167,6 @@ minBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Aplicar automáticamente FFlags guardadas al abrir
 if jsonFile.Value ~= "" then
-	applyFFlagsFromJSON(jsonFile.Value)
-endsaveBtn.Font = Enum.Font.Gotham
-saveBtn.TextSize = 16
-saveBtn.Text = "Guardar"
-saveBtn.Parent = main
-
-local rejoinBtn = Instance.new("TextButton")
-rejoinBtn.Size = UDim2.fromScale(0.45,0.1)
-rejoinBtn.Position = UDim2.fromScale(0.525,0.82)
-rejoinBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
-rejoinBtn.TextColor3 = Color3.fromRGB(235,235,235)
-rejoinBtn.Font = Enum.Font.Gotham
-rejoinBtn.TextSize = 16
-rejoinBtn.Text = "Guardar + Rejoin"
-rejoinBtn.Parent = main
-
-local function applyFFlags()
-	local ok, data = pcall(function()
-		return HttpService:JSONDecode(textBox.Text)
-	end)
-	if not ok then
-		warn("JSON inválido")
-		return
-	end
-	local fflagsFolder = bloxBeta:FindFirstChild("FFlags") or Instance.new("Folder", bloxBeta)
-	fflagsFolder.Name = "FFlags"
-	for k,v in pairs(data) do
-		local success, err = pcall(function()
-			if type(v) == "boolean" then
-				settings():SetFFlag(k, v)
-			elseif type(v) == "number" then
-				settings():SetDFFlag(k, v)
-			else
-				settings():SetFFlag(k, tostring(v))
-			end
-		end)
-	end
+	applyFFlags(jsonFile.Value)
 end
-
-saveBtn.MouseButton1Click:Connect(applyFFlags)
-rejoinBtn.MouseButton1Click:Connect(function()
-	applyFFlags()
-	TeleportService:Teleport(game.PlaceId, player)
-end)
-
-closeBtn.MouseButton1Click:Connect(function()
-	gui:Destroy()
-end)
-
-local minimized = false
-minBtn.MouseButton1Click:Connect(function()
-	minimized = not minimized
-	textBox.Visible = not minimized
-	saveBtn.Visible = not minimized
-	rejoinBtn.Visible = not minimized
-	descLabel.Visible = not minimized
-	if minimized then
-		main.Size = UDim2.fromScale(0.45,0.1)
-	else
-		main.Size = UDim2.fromScale(0.45,0.6)
-	end
-end)saveBtn.TextSize = 16
-saveBtn.Text = "Guardar"
-saveBtn.Parent = main
-
-local rejoinBtn = Instance.new("TextButton")
-rejoinBtn.Size = UDim2.fromScale(0.45,0.1)
-rejoinBtn.Position = UDim2.fromScale(0.525,0.82)
-rejoinBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
-rejoinBtn.TextColor3 = Color3.fromRGB(235,235,235)
-rejoinBtn.Font = Enum.Font.Gotham
-rejoinBtn.TextSize = 16
-rejoinBtn.Text = "Guardar + Rejoin"
-rejoinBtn.Parent = main
-
-local function saveFFlags()
-	local fflagsData = bloxBeta:FindFirstChild("FFlags") or Instance.new("StringValue", bloxBeta)
-	fflagsData.Name = "FFlags"
-	fflagsData.Value = textBox.Text
-end
-
-saveBtn.MouseButton1Click:Connect(saveFFlags)
-rejoinBtn.MouseButton1Click:Connect(function()
-	saveFFlags()
-	TeleportService:Teleport(game.PlaceId, player)
-end)
-
-closeBtn.MouseButton1Click:Connect(function()
-	gui:Destroy()
-end)
-
-local minimized = false
-minBtn.MouseButton1Click:Connect(function()
-	minimized = not minimized
-	textBox.Visible = not minimized
-	saveBtn.Visible = not minimized
-	rejoinBtn.Visible = not minimized
-	descLabel.Visible = not minimized
-	if minimized then
-		main.Size = UDim2.fromScale(0.45,0.1)
-	else
-		main.Size = UDim2.fromScale(0.45,0.6)
-	end
-end)
