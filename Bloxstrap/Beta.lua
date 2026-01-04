@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 
@@ -82,7 +83,7 @@ textBox.Position = UDim2.fromScale(0.02,0.18)
 textBox.MultiLine = true
 textBox.ClearTextOnFocus = false
 textBox.Text = ""
-textBox.PlaceholderText = "Pegá tus FFlags aquí"
+textBox.PlaceholderText = "Pegá tus FFlags aquí "
 textBox.Font = Enum.Font.Code
 textBox.TextSize = 14
 textBox.TextColor3 = Color3.fromRGB(230,230,230)
@@ -98,6 +99,65 @@ saveBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
 saveBtn.TextColor3 = Color3.fromRGB(235,235,235)
 saveBtn.Font = Enum.Font.Gotham
 saveBtn.TextSize = 16
+saveBtn.Text = "Guardar"
+saveBtn.Parent = main
+
+local rejoinBtn = Instance.new("TextButton")
+rejoinBtn.Size = UDim2.fromScale(0.45,0.1)
+rejoinBtn.Position = UDim2.fromScale(0.525,0.82)
+rejoinBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+rejoinBtn.TextColor3 = Color3.fromRGB(235,235,235)
+rejoinBtn.Font = Enum.Font.Gotham
+rejoinBtn.TextSize = 16
+rejoinBtn.Text = "Guardar + Rejoin"
+rejoinBtn.Parent = main
+
+local function applyFFlags()
+	local ok, data = pcall(function()
+		return HttpService:JSONDecode(textBox.Text)
+	end)
+	if not ok then
+		warn("JSON inválido")
+		return
+	end
+	local fflagsFolder = bloxBeta:FindFirstChild("FFlags") or Instance.new("Folder", bloxBeta)
+	fflagsFolder.Name = "FFlags"
+	for k,v in pairs(data) do
+		local success, err = pcall(function()
+			if type(v) == "boolean" then
+				settings():SetFFlag(k, v)
+			elseif type(v) == "number" then
+				settings():SetDFFlag(k, v)
+			else
+				settings():SetFFlag(k, tostring(v))
+			end
+		end)
+	end
+end
+
+saveBtn.MouseButton1Click:Connect(applyFFlags)
+rejoinBtn.MouseButton1Click:Connect(function()
+	applyFFlags()
+	TeleportService:Teleport(game.PlaceId, player)
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+	gui:Destroy()
+end)
+
+local minimized = false
+minBtn.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	textBox.Visible = not minimized
+	saveBtn.Visible = not minimized
+	rejoinBtn.Visible = not minimized
+	descLabel.Visible = not minimized
+	if minimized then
+		main.Size = UDim2.fromScale(0.45,0.1)
+	else
+		main.Size = UDim2.fromScale(0.45,0.6)
+	end
+end)saveBtn.TextSize = 16
 saveBtn.Text = "Guardar"
 saveBtn.Parent = main
 
